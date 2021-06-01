@@ -35,6 +35,10 @@ public class UserChangedHandler {
         updateNameInComments(user)
                 .subscribeOn(Schedulers.elastic())
                 .subscribe();
+
+        updateNameInUserRoles(user)
+                .subscribeOn(Schedulers.elastic())
+                .subscribe();
     }
 
     private Mono<Void> updateNameInComments(User user) {
@@ -44,6 +48,16 @@ public class UserChangedHandler {
         }
 
         log.debug("Updating name in comments for user {}", user.getId());
+        return commentRepository.updateAuthorNames(user.getId(), user.getName());
+    }
+
+    private Mono<Void> updateNameInUserRoles(User user) {
+        if (user.getId() == null) {
+            log.warn("Attempt to update name in userRoles of organization for user with null ID.");
+            return Mono.empty();
+        }
+
+        log.debug("Updating name in userRoles of organization for user {}", user.getId());
         return commentRepository.updateAuthorNames(user.getId(), user.getName());
     }
 
